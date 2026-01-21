@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faith Focus</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #0f172a, #020617);
+      color: #e5e7eb;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .app {
+      width: 100%;
+      max-width: 420px;
+      padding: 24px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      text-align: center;
+      opacity: 0.8;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .verse {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+    .ref {
+      margin-top: 8px;
+      font-style: italic;
+      opacity: 0.85;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .day {
+      padding: 10px 0;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 0.9rem;
+      background: #020617;
+      border: 1px solid #334155;
+      cursor: pointer;
+    }
+    .day.pure {
+      background: #14532d;
+      border-color: #22c55e;
+    }
+    .day.fall {
+      background: #7f1d1d;
+      border-color: #ef4444;
+    }
+    .legend {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-top: 10px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+      background: #2563eb;
+      color: white;
+    }
+    button.secondary {
+      background: #020617;
+      border: 1px solid #334155;
+    }
+    button.emergency {
+      background: #991b1b;
+    }
+    .prayer {
+      text-align: center;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.8rem;
+      opacity: 0.6;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Faith Focus</h1>
+    <div class="subtitle">"One day at a time with God"</div>
+
+    <div class="card">
+      <div class="verse" id="verse"></div>
+      <div class="ref" id="ref"></div>
+    </div>
+
+    <div class="card">
+      <strong>This Month</strong>
+      <div class="calendar" id="calendar"></div>
+      <div class="legend">
+        <span>🟩 Faithful day</span>
+        <span>🟥 Struggled</span>
+      </div>
+      <button onclick="markToday(true)">Mark today as faithful</button>
+      <button class="secondary" onclick="markToday(false)">Mark today as struggled</button>
+    </div>
+
+    <div class="card">
+      <div class="prayer">
+        <strong>Prayer</strong><br /><br />
+        Lord, I give You today. Whether I stood strong or stumbled,
+        I trust Your mercy is new every morning.
+        Teach me to walk with You tomorrow. Amen.
+      </div>
+    </div>
+
+    <div class="card">
+      <button class="emergency" onclick="emergency()">🚨 Temptation Button</button>
+    </div>
+
+    <footer>
+      Faithfulness is measured in surrender, not perfection.
+    </footer>
+  </div>
+
+  <script>
+    const verses = [
+      { text: "Blessed are the pure in heart, for they shall see God.", ref: "Matthew 5:8" },
+      { text: "Walk by the Spirit, and you will not gratify the desires of the flesh.", ref: "Galatians 5:16" },
+      { text: "Create in me a clean heart, O God.", ref: "Psalm 51:10" },
+      { text: "The Lord is merciful and gracious, slow to anger and abounding in steadfast love.", ref: "Psalm 103:8" }
+    ];
+
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    function loadVerse() {
+      const v = verses[Math.floor(Math.random() * verses.length)];
+      document.getElementById('verse').innerText = v.text;
+      document.getElementById('ref').innerText = v.ref;
+    }
+
+    function loadCalendar() {
+      const calendar = document.getElementById('calendar');
+      calendar.innerHTML = '';
+      const data = JSON.parse(localStorage.getItem('calendarData') || '{}');
+
+      for (let d = 1; d <= daysInMonth; d++) {
+        const key = `${year}-${month}-${d}`;
+        const div = document.createElement('div');
+        div.className = 'day';
+        div.innerText = d;
+        if (data[key] === 'pure') div.classList.add('pure');
+        if (data[key] === 'fall') div.classList.add('fall');
+        calendar.appendChild(div);
+      }
+    }
+
+    function markToday(isPure) {
+      const data = JSON.parse(localStorage.getItem('calendarData') || '{}');
+      const key = `${year}-${month}-${today.getDate()}`;
+      data[key] = isPure ? 'pure' : 'fall';
+      localStorage.setItem('calendarData', JSON.stringify(data));
+      loadCalendar();
+    }
+
+    function emergency() {
+      document.body.innerHTML = `
+        <div style="padding:40px; text-align:center; color:#e5e7eb; font-family:system-ui;">
+          <h1>Pause.</h1>
+          <p style="max-width:400px; margin:20px auto;">
+            This urge will pass. God is with you right now.
+          </p>
+          <p><strong>Pray for 60 seconds.</strong></p>
+          <p>"Lord, help me choose You in this moment."</p>
+        </div>
+      `;
+      setTimeout(() => location.reload(), 60000);
+    }
+
+    loadVerse();
+    loadCalendar();
+  </script>
+</body>
+</html>
